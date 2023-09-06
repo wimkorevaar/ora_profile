@@ -136,6 +136,7 @@
 # See the file "LICENSE" for the full license governing this code.
 #
 class ora_profile::database::db_definition (
+# lint:ignore:manifest_whitespace_opening_brace_before
 # lint:ignore:strict_indent
 # lint:ignore:lookup_in_parameter
   Enum['enabled', 'disabled']
@@ -169,8 +170,10 @@ class ora_profile::database::db_definition (
   String[1] $user_tablespace_size,
   Ora_Install::Version
             $version,
+# lint:ignore:manifest_whitespace_opening_brace_before
   Variant[Boolean, Enum['on_failure']]
-            $logoutput = lookup({ name => 'logoutput', default_value => 'on_failure' })
+            $logoutput = lookup({ name => 'logoutput', default_value => 'on_failure' }),
+# lint:endignore:manifest_whitespace_opening_brace_before
 ) inherits ora_profile::database {
 # lint:endignore:strict_indent
 # lint:endignore:lookup_in_parameter
@@ -313,7 +316,9 @@ class ora_profile::database::db_definition (
       }
     }
   } else {
-    $database = $dbname.map |$db, $db_props| {{ $db => deep_merge($dbname_defaults, $db_props) } }.reduce({}) |$memo, $array| { $memo + $array }
+    # lint:ignore:manifest_whitespace_opening_brace_before
+    $database = $dbname.map |$db, $db_props| { { $db => deep_merge($dbname_defaults, $db_props) } }.reduce({}) |$memo, $array| { $memo + $array }
+    # lint:endignore:manifest_whitespace_opening_brace_before
   }
 
   if ( $master_node == $facts['networking']['hostname'] ) {
@@ -336,7 +341,7 @@ class ora_profile::database::db_definition (
         * => $all_db_props,
       }
 
-      if ( $db_props['ensure'] == present ) {
+      if ( $db_props['ensure'] == present and $db_props['contained_by'] == Undef) {
         #
         # Database is done. Now start it
         #
@@ -385,6 +390,14 @@ class ora_profile::database::db_definition (
             }
             default: {
               false
+            }
+          },
+          daemonized  => case $is_windows {
+            true: {
+              false
+            }
+            default: {
+              true
             }
           },
         }
