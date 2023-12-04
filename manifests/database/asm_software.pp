@@ -212,12 +212,14 @@ class ora_profile::database::asm_software (
     mode   => '0775',
   }
 
-  -> file { $download_dir:
-    ensure  => directory,
-    owner   => $os_user,
-    group   => $install_group,
-    seltype => 'default_t',
-    mode    => '0775',
+  -> unless defined(File[$download_dir]) {
+    file { $download_dir:
+      ensure  => directory,
+      owner   => $os_user,
+      group   => $install_group,
+      seltype => 'default_t',
+      mode    => '0775',
+    }
   }
 
   if ( $master_node == $facts['networking']['hostname'] ) {
